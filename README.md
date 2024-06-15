@@ -1,245 +1,153 @@
-# JWT Rest API
+# Documentação da API REST JWT
 
-Este projeto é uma implementação de uma API REST utilizando Spring Boot com segurança baseada em JWT (JSON Web Token).
+## Visão Geral
 
-## Índice
-
-- [Pré-requisitos](#pré-requisitos)
-- [Instalação](#instalação)
-- [Estrutura do Projeto](#estrutura-do-projeto)
-- [Configuração de Segurança](#configuração-de-segurança)
-- [Utilização](#utilização)
-- [Endpoints](#endpoints)
-- [Contribuição](#contribuição)
-- [Licença](#licença)
+Este projeto demonstra uma implementação simples de uma API REST com autenticação JWT (JSON Web Token) usando Spring Boot. A API inclui papéis de usuários e controle de acesso para diferentes endpoints.
 
 ## Pré-requisitos
 
-Antes de começar, certifique-se de ter o seguinte instalado:
-
-- JDK 8 ou superior
-- Maven
-- IDE (recomendado: IntelliJ, Eclipse, VS Code)
-
-## Instalação
-
-1. Clone o repositório:
-   ```bash
-   git clone https://github.com/seu-usuario/jwt-rest-api.git
-   ```
-2. Navegue até o diretório do projeto:
-   ```bash
-   cd jwt-rest-api
-   ```
-3. Compile o projeto usando Maven:
-   ```bash
-   mvn clean install
-   ```
-4. Execute a aplicação:
-   ```bash
-   mvn spring-boot:run
-   ```
+- Java 8 ou superior
+- Maven ou Gradle
+- IDE (IntelliJ IDEA, Eclipse, etc.)
 
 ## Estrutura do Projeto
 
-```plaintext
-jwt-rest-api
-├── src
-│   ├── main
-│   │   ├── java
-│   │   │   └── com
-│   │   │       └── example
-│   │   │           ├── JWT_RestAPI
-│   │   │           │   ├── application
-│   │   │           │   │   └── JwtRestApiApplication.java
-│   │   │           │   ├── config
-│   │   │           │   │   └── SecurityConfig.java
-│   │   │           │   ├── controller
-│   │   │           │   │   └── AuthController.java
-│   │   │           │   ├── model
-│   │   │           │   │   └── LoginRequest.java
-│   │   │           │   ├── security
-│   │   │           │   │   └── JwtUtil.java
-│   │   │           │   └── service
-│   │   │           │       └── AuthService.java
-│   │   └── resources
-│   │       └── application.properties
-│   └── test
-│       └── java
-│           └── com
-│               └── example
-│                   └── JWT_RestAPI
-│                       └── JwtRestApiApplicationTests.java
-└── pom.xml
-```
+O projeto está dividido em vários pacotes, cada um com responsabilidades específicas:
 
-### Classe Principal
+1. **application**: Contém a classe principal para executar a aplicação Spring Boot.
+2. **config**: Contém classes de configuração para as configurações de segurança.
+3. **controller**: Contém controladores REST para manipulação de requisições HTTP.
+4. **model**: Contém modelos de dados para requisições e respostas.
+5. **security**: Contém classes utilitárias para operações JWT.
+6. **service**: Contém classes de serviço para lógica de negócios.
 
-**JwtRestApiApplication.java**
+## Componentes Principais
 
-```java
-package com.example.JWT_RestAPI.application;
+### Ponto de Entrada da Aplicação
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-@SpringBootApplication(scanBasePackages = {"com.example"})
-public class JwtRestApiApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(JwtRestApiApplication.class, args);
-    }
-}
-```
+- `JwtRestApiApplication`: A classe principal que inicializa a aplicação Spring Boot.
 
 ### Configuração de Segurança
 
-**SecurityConfig.java**
+- `SecurityConfig`: Configura as definições de segurança HTTP, detalhes do usuário e codificação de senhas.
 
-Configura a segurança da aplicação, definindo permissões de acesso e configurando autenticação básica.
+### Controladores
 
-```java
-package com.example.JWT_RestAPI.config;
+- `AuthController`: Manipula requisições relacionadas à autenticação.
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.web.SecurityFilterChain;
+### Modelos
 
-@Configuration
-@EnableWebSecurity
-public class SecurityConfig {
+- `LoginRequest`: Representa a carga útil da requisição de login.
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(request -> request
-                        .requestMatchers(HttpMethod.POST, "/login/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/username/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/user/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/admin/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/moderado/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/comum/**").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/moderado/**").hasRole("MODERADO")
-                        .requestMatchers("/comum/**").hasRole("COMUM")
-                        .anyRequest()
-                        .authenticated()
-                ).httpBasic(Customizer.withDefaults());
-        return http.build();
+### Utilitário de Segurança
+
+- `JwtUtil`: Contém métodos para gerar e extrair informações de JWTs.
+
+### Serviços
+
+- `AuthService`: Fornece métodos para gerar tokens e extrair nomes de usuário.
+
+## Descrição Detalhada
+
+### Ponto de Entrada da Aplicação
+
+O ponto de entrada da aplicação é a classe `JwtRestApiApplication`. Ela utiliza a anotação `@SpringBootApplication` para habilitar a configuração automática e a varredura de componentes.
+
+### Configuração de Segurança
+
+A classe `SecurityConfig` configura o seguinte:
+
+- **Proteção CSRF**: Desativada para simplicidade.
+- **Segurança dos Endpoints**: Configura quais endpoints são acessíveis para quais papéis:
+  - `/login/**`, `/username/**`, `/user/**`, `/admin/**`, `/moderado/**` e `/comum/**` são todos acessíveis sem autenticação.
+  - `/admin/**` é restrito a usuários com o papel "ADMIN".
+  - `/moderado/**` é restrito a usuários com o papel "MODERADO".
+  - `/comum/**` é restrito a usuários com o papel "COMUM".
+  - Todas as outras requisições requerem autenticação.
+
+A classe também configura um serviço de detalhes do usuário em memória com três usuários tendo diferentes papéis e um codificador de senhas.
+
+### Controladores
+
+O `AuthController` fornece os seguintes endpoints:
+
+- **POST /login**: Autentica um usuário e retorna um token JWT.
+- **GET /username/{token}**: Extrai o nome de usuário de um token JWT fornecido.
+- **GET /user**: Retorna as informações do usuário autenticado.
+- **GET /admin**: Restrito a usuários administradores; retorna informações específicas do administrador.
+- **GET /moderado**: Restrito a usuários moderados; retorna informações específicas do moderador.
+- **GET /comum**: Acessível a usuários comuns; retorna informações específicas do usuário comum.
+
+### Modelos
+
+A classe `LoginRequest` representa a carga útil para a requisição de login, contendo um nome de usuário e uma senha.
+
+### Utilitário de Segurança
+
+A classe `JwtUtil` fornece métodos para:
+
+- Gerar um token JWT para um determinado nome de usuário.
+- Extrair o nome de usuário de um token JWT fornecido.
+- Extrair o ID de um token JWT fornecido (método não utilizado na implementação atual).
+
+### Serviços
+
+A classe `AuthService` atua como intermediária entre o controlador e a classe utilitária. Ela utiliza o `JwtUtil` para gerar tokens e extrair nomes de usuário de tokens.
+
+## Uso
+
+1. **Executar a Aplicação**: Use sua IDE ou linha de comando para executar a classe `JwtRestApiApplication`.
+2. **Autenticar**: Envie uma requisição POST para `/login` com uma carga JSON contendo `username` e `password`. Exemplo:
+    ```json
+    {
+      "username": "Larissa",
+      "password": "4321"
     }
+    ```
+3. **Acessar Endpoints Seguros**: Use o token JWT retornado para acessar outros endpoints, incluindo-o no cabeçalho `Authorization` como um token Bearer.
 
-    @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails user = User.builder()
-                .username("Larissa")
-                .password(passwordEncoder().encode("4321"))
-                .roles("ADMIN")
-                .build();
-        UserDetails moderado = User.builder()
-                .username("Chandler")
-                .password(passwordEncoder().encode("123"))
-                .roles("MODERADO")
-                .build();
-        UserDetails comum = User.builder()
-                .username("Rachel")
-                .password(passwordEncoder().encode("456"))
-                .roles("COMUM")
-                .build();
-        return new InMemoryUserDetailsManager(user, moderado, comum);
-    }
+## Exemplos de Requisições
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-}
-```
+1. **Requisição de Login**:
+    ```sh
+    curl -X POST http://localhost:8080/login -H "Content-Type: application/json" -d '{"username": "Larissa", "password": "4321"}'
+    ```
+2. **Extrair Nome de Usuário**:
+    ```sh
+    curl -X GET http://localhost:8080/username/{token}
+    ```
+3. **Acessar Endpoint de Administrador**:
+    ```sh
+    curl -X GET http://localhost:8080/admin -H "Authorization: Bearer {token}"
+    ```
 
-## Utilização
+## Conclusão
 
-### Autenticação
+Este projeto fornece uma compreensão fundamental de como implementar autenticação JWT em uma aplicação Spring Boot. Inclui controle de acesso baseado em papéis e demonstra o manuseio seguro da autenticação e autorização de usuários.
 
-Para autenticar um usuário, envie uma requisição POST para o endpoint `/login` com um payload JSON contendo `username` e `password`.
+Para mais detalhes, consulte o código e os comentários dentro de cada classe.
 
-**Exemplo de Requisição:**
+## Diagrama 
 
-```json
-POST /login
-Content-Type: application/json
+![AUTENTICACAO-DIAGRAMA](https://github.com/Lellis17/Autentifica-aoEAutoriza-ao/assets/111644936/d71b3e0c-f674-4edc-887a-a4584864e6f4)
 
-{
-  "username": "Larissa",
-  "password": "4321"
-}
-```
 
-**Exemplo de Resposta:**
+## Imagens do Insomnia em execução
 
-```json
-{
-  "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJMYXJpc3NhIiwiaWF0IjoxNjQ0MjkxOTUyfQ.wTzIwo9R5doB9gH8BpLw3MPBZ-3dGw7ibuhFl7qOUoQ"
-}
-```
+![Captura de tela 2024-06-14 221713](https://github.com/Lellis17/Autentifica-aoEAutoriza-ao/assets/111644936/ee6834a6-8645-4aeb-8a31-d827d0ca3ec8)
 
-## Endpoints
+![Captura de tela 2024-06-14 221657](https://github.com/Lellis17/Autentifica-aoEAutoriza-ao/assets/111644936/bc617ba7-bd5d-4df0-92fa-c41b409eeb7e)
 
-### `POST /login`
+![Captura de tela 2024-06-14 221635](https://github.com/Lellis17/Autentifica-aoEAutoriza-ao/assets/111644936/cb79bbd1-06fa-4ad4-8e53-2433e99b4af5)
 
-Autentica o usuário e retorna um token JWT.
+![Captura de tela 2024-06-14 221610](https://github.com/Lellis17/Autentifica-aoEAutoriza-ao/assets/111644936/b755d5dd-56e2-4eaa-b63d-4194f5b43089)
 
-### `GET /username/{token}`
+![Captura de tela 2024-06-14 221420](https://github.com/Lellis17/Autentifica-aoEAutoriza-ao/assets/111644936/7825e7f4-5a90-4169-82b6-81dfed03f166)
 
-Extrai o nome de usuário a partir de um token JWT.
+![Captura de tela 2024-06-14 221730](https://github.com/Lellis17/Autentifica-aoEAutoriza-ao/assets/111644936/40e27dbc-f7f6-4724-8c2f-d5970c1f09e9)
 
-### `GET /user`
 
-Retorna o nome do usuário autenticado.
 
-### `GET /admin`
 
-Acesso restrito para administradores.
 
-### `GET /moderado`
 
-Acesso restrito para usuários moderados.
-
-### `GET /comum`
-
-Acesso restrito para usuários comuns.
-
-## Contribuição
-
-1. Fork o projeto.
-2. Crie uma nova branch:
-   ```bash
-   git checkout -b minha-feature
-   ```
-3. Faça as alterações necessárias.
-4. Commit suas mudanças:
-   ```bash
-   git commit -m 'Adicionando minha feature'
-   ```
-5. Push para a branch:
-   ```bash
-   git push origin minha-feature
-   ```
-6. Abra um Pull Request.
-
-## Licença
-
-Distribuído sob a licença MIT. Veja `LICENSE` para mais informações.
-
----
-
-Esta documentação deve fornecer uma visão geral suficiente para que outros desenvolvedores possam entender, instalar, configurar e contribuir com o projeto.
